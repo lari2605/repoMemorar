@@ -20,6 +20,126 @@
 
     <title>Crie sua conta || Loja Memorar</title>
     <meta name="description" content="Crie sua conta online na Loja Memorar!" />
+
+    <script type="text/javascript">
+      let users = [
+        {
+          id: "1",
+          name: "Larry",
+          telephone: "3515413510",
+          birthday: "12/12/2012",
+          email: "babanana@bnana.com",
+          cpf: "12345678900",
+        },
+        {
+          id: "2",
+          name: "Mori",
+          telephone: "123456789",
+          birthday: "12/10/2000",
+          email: "paleninja@kubernets.com",
+          cpf: "12345688800",
+        },
+      ];
+      document.addEventListener("DOMContentLoaded", function () {
+        renderUsers(users);
+
+        document
+          .getElementById("createAccount")
+          .addEventListener("submit", function () {
+            event.preventDefault();
+
+            clearFormErrors();
+            registerUser();
+          });
+
+        function clearFormErrors() {
+          const error = document.getElementById("errorMessage");
+          error.setAttribute("hidden", true);
+        }
+
+        function registerUser() {
+          let name = document.getElementById("UserName");
+          let telephone = document.getElementById("telephoneNumber");
+          let birthday = document.getElementById("birthday");
+          let email = document.getElementById("email");
+          let password = document.getElementById("password");
+          let checkPassword = document.getElementById("repeatedPassword");
+          let cpf = document.getElementById("CPF");
+
+          if (password.value != checkPassword.value) {
+            const error = document.getElementById("errorMessage");
+            error.removeAttribute("hidden");
+            error.innerHTML =
+              "Suas senhas não são iguais, por favor verifique!";
+          } else {
+            const registered = document.getElementById("registeredMessage");
+            registered.setAttribute("hidden", false);
+          }
+
+          const params = {
+            id: users.length + 1,
+            name: name.value,
+            telephone: telephone.value,
+            birthday: birthday.value,
+            email: email.value,
+            password: password.value,
+            cpf: cpf.value,
+          };
+
+          users.push(params);
+
+          renderUsers(users);
+        }
+
+        function renderUsers(users) {
+          clearTableRows();
+
+          for (var i = 0; i < users.length; i++) {
+            renderNewRow(users[i]);
+          }
+
+          const registered = document.getElementById("registeredMessage");
+          registered.setAttribute("hidden", true);
+        }
+
+        function clearTableRows() {
+          var myTable = document.getElementById("registers");
+          var rowCount = myTable.rows.length;
+
+          for (var i = rowCount - 1; i > 0; i--) {
+            myTable.deleteRow(i);
+          }
+        }
+
+        function renderNewRow(params) {
+          let formRow =
+            '<tr>\
+              <th scope="row">' +
+            params.id +
+            "</th>\
+              <td>" +
+            params.name +
+            "</td>\
+              <td>" +
+            params.telephone +
+            "</td>\
+              <td>" +
+            params.birthday +
+            "</td>\
+              <td>" +
+            params.email +
+            "</td>\
+              <td>" +
+            params.cpf +
+            "</td>\
+            </tr>";
+
+          const table = document.getElementById("registers");
+          var newRow = table.insertRow(table.rows.length);
+          newRow.innerHTML = formRow;
+        }
+      });
+    </script>
   </head>
   <body>
     <main>
@@ -130,6 +250,14 @@
             <label for="CPF">CPF</label>
           </div>
 
+          <div class="alert alert-success" id="registeredMessage" hidden>
+            Tudo certo! Estamos carregando as suas informações! 😊
+          </div>
+
+          <div class="alert alert-danger" id="errorMessage" hidden>
+            Suas senhas não são iguais, por favor verifique!
+          </div>
+
           <button
             class="btn btn-primary p-3 px-5 w-auto m-auto"
             type="submit"
@@ -138,6 +266,20 @@
             Criar Conta
           </button>
         </form>
+
+        <table id="registers" class="table table-striped mt-4">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Telefone</th>
+              <th scope="col">Nascimento</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">CPF</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </main>
 
