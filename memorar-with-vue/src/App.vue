@@ -1,6 +1,6 @@
 <template>
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -42,7 +42,7 @@
               v-model="userForm.name"
               id="UserName"
               placeholder="Nome Completo"
-              name="UserName"
+              name="name"
               type="text"
               minlength="5"
               required
@@ -57,7 +57,7 @@
               placeholder="Telefone"
               name="telephoneNumber"
               type="tel"
-              patern="\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s$"
+              maxlength="14"
               required
             />
             <label for="telephoneNumber"> Telefone</label>
@@ -128,7 +128,7 @@
               v-model="userForm.cpf"
               id="CPF"
               placeholder="CPF"
-              name="CPF"
+              name="cpf"
               type="text"
               pattern="^([-\.\s]?(\d{3})){3}[-\.\s]?(\d{2})$"
               required
@@ -168,7 +168,7 @@
             <tr v-for="user in users" :key="user.id">
               <th scope="row">{{user.id}}</th>
               <td> {{user.name}}</td>
-              <td> {{user.telephone}}</td>
+              <td> {{user.telephoneNumber}}</td>
               <td> {{user.birthDate}} </td>
               <td> {{user.email}} </td>
               <td> {{user.cpf}} </td>
@@ -182,6 +182,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: "App",
   components: {},
@@ -194,19 +196,47 @@ export default {
       users:[]
    }
   },
+  
   methods: {
+    async postUsers(){
+      try {
+        await axios.post("http://localhost:9090/user",this.data);
+        this.getUsers();
+        this.showConfirmMessage = true
+      } catch (error) {
+        console.log(error)
+        this.showErrorMessage = true
+        this.errorMessage= 'Não conseguimos salvar seus dados, por favor, tente novamente!'
+      }
+    },
     onSubmitFunction: function(){
-      if(this.userForm.password != this.userForm.repeatedPassword){
+      if(this.userForm.repeatedPassword != this.userForm.password){
+        
         this.showErrorMessage = true
         this.errorMessage= 'As senhas são diferentes, por favor verifique!'
-      }else{
-        this.showErrorMessage = false
-        this.showConfirmMessage = true
-        this.users.push({
-          id: this.users.length + 1,
-          ...this.userForm})
-      }
+     
+     }else{
+        this.showErrorMessage = false      
+
+        const data = new URLSearchParams();
+
+        for(var[key, value] of Object.entries(this.userForm)){
+          data.append(key, value);
+        }
+
+        this.postUsers();      
+     }
+    },
+
+    getUsers: function(){
+      axios
+        .get('http://localhost:9090/user').then((response) => {
+          this.users = response.data;})   
     }
+  },
+  
+  mounted: function(){
+    this.getUsers()
   }
 };
 </script>
